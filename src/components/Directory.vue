@@ -7,19 +7,13 @@
         
           <b-button-toolbar aria-label="Toolbar with button groups and input groups">
             <b-dropdown class="mr-2" @click="toggle_direction()" split variant="outline-myst">
-              <template #button-content v-if="is_forward">Sort<b-icon-arrow-up /></template>
-              <template #button-content v-else>Sort<b-icon-arrow-down /></template>
+              <template #button-content v-if="is_forward">Sort: {{current_sort.name}}<b-icon-arrow-up /></template>
+              <template #button-content v-else>Sort: {{current_sort.name}}<b-icon-arrow-down /></template>
               <b-dropdown-item v-for="(element, index) in sort_options" :key="index" 
-                                @click="sort_students(element.value)">{{element.name}}</b-dropdown-item>
+                                @click="sort_students(element)">{{element.name}}</b-dropdown-item>
             </b-dropdown>
             
-            <b-dropdown class="mr-2" split variant="outline-myst" text="Filter">
-              <b-dropdown-form>
-
-              </b-dropdown-form>
-              <b-dropdown-divider />
-              <b-dropdown-item @click="apply_filter('random')">Apply</b-dropdown-item>
-            </b-dropdown>
+            <b-button class="mr-2" variant="outline-myst" @click="open_filter()">Filter</b-button>
             
             <b-input-group size="md">
               <b-form-input placeholder="Search" class="text-right"></b-form-input>
@@ -28,7 +22,7 @@
         
       </b-row>
       <b-row>
-        <b-col  sm="12" lg="4" md="6" v-for="(student, index) in roster" :key="index">
+        <b-col  sm="12" lg="4" md="6" v-for="(student, index) in students_to_display" :key="index">
           <IDCard :name="student.name"
                   :track="student.track"
                   :specification="student.specification"
@@ -42,6 +36,7 @@
                   :track="student.track"
                   :specification="student.specification"
                   :year="student.year"/>
+    <Tags :all_options="filter_options" v-on:filter="filter_students" />
   </div>
 </template>
 
@@ -50,6 +45,7 @@ import IDCard from './IDCard.vue'
 import StudentPopup from './StudentPopup.vue'
 
 import {test_data} from '../data/students.js'
+import Tags from './Tags.vue'
 
 export default {
   name: 'Directory',
@@ -63,30 +59,43 @@ export default {
         {name: "Last Name", value: "last_name"},
         {name: "Track", value: "track"},
         {name: "Specification", value: "specification"},
-        {name: "Year", value: "year"},
+        {name: "Year", value: "year", options: this.years},
         {name: "Race", value: "race"},
         {name: "Random", value: "random"}
       ],
-      current_sort: "name",
-      years: ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh"]
+      current_sort: {name: "First Name", value: "name"},
+      filter_tags: [],
+      years: ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh"],
+      tracks: ["Assualt", "Protection", "Diplomacy", "Exploration"],
+      specifications: ["Barbarian","Bard","Cleric","Druid","Fighter","Monk","Paladin","Ranger","Rouge","Sorcerer","Wizard"],
+      races: ["Dwarf","Elf","Gnome","Half-Elf","Halfling","Human","Dragonborn","Half-Orc","Tiefling","Firbolg","Tabaxi","Aarakocra","Triton","Kenku","Aasimar","Genasi","Goliath","Warforged"],
     }
   },
   components: {
     IDCard,
-    StudentPopup
+    StudentPopup,
+    Tags
   },
   methods: {
+    open_filter(){
+      this.$bvModal.show("filter_modal");
+    },
+
+    filter_students(tags){
+      console.log(tags)
+    },
+
     sort_students(criteria){
-      if(criteria === "random"){
+      if(criteria.value === "random"){
         this.shuffle_students()
         return
       }
-      if(criteria === "last_name"){
+      if(criteria.value === "last_name"){
         this.roster.sort((a,b) => (a["name"].split(" ")[1] > b["name"].split(" ")[1]) ? this.forward : this.reverse)
-      } else if (criteria === "year"){
+      } else if (criteria.value === "year"){
         this.roster.sort((a,b) => this.years.indexOf(a.year) > this.years.indexOf(b.year) ? this.forward : this.reverse)
       } else {
-        this.roster.sort((a,b) => (a[criteria] > b[criteria]) ? this.forward : this.reverse)
+        this.roster.sort((a,b) => (a[criteria.value] > b[criteria.value]) ? this.forward : this.reverse)
       }
       this.current_sort = criteria
     },
@@ -118,10 +127,21 @@ export default {
     }
   },
   computed: {
-    is_forward () {
+    students_to_display(){
+      return this.roster
+    },
+    is_forward(){
       if (this.forward === 1) return true
       return false
-    }
+    },
+    filter_options(){
+      return [
+        {group: "Years", values: this.years},
+        {group: "Tracks", values: this.tracks},
+        {group: "Specifications", values: this.specifications},
+        {group: "Races", values: this.races}
+      ]
+    } 
   },
   mounted () {
     this.roster.sort((a,b) => (a.name > b.name) ? 1 : -1);
