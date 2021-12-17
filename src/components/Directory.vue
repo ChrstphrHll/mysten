@@ -65,6 +65,8 @@ export default {
       ],
       current_sort: {name: "First Name", value: "name"},
       filter_tags: [],
+      limit_students_toggle: false,
+      limit_students: 10,
       years: ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh"],
       tracks: ["Assualt", "Protection", "Diplomacy", "Exploration"],
       specifications: ["Barbarian","Bard","Cleric","Druid","Fighter","Monk","Paladin","Ranger","Rouge","Sorcerer","Wizard"],
@@ -83,6 +85,9 @@ export default {
 
     filter_students(tags){
       console.log(tags)
+      this.filter_tags = []
+      this.filter_tags = this.filter_tags.concat(tags)
+
     },
 
     sort_students(criteria){
@@ -128,6 +133,14 @@ export default {
   },
   computed: {
     students_to_display(){
+      let students_to_render = this.roster.length
+      if (this.limit_students_toggle) students_to_render = this.limit_students
+
+      if (this.filter_tags.length > 0) {
+        for(let i = 0; i < students_to_render; i++){
+          console.log(i)
+        }
+      }
       return this.roster
     },
     is_forward(){
@@ -141,7 +154,7 @@ export default {
         {group: "Specifications", values: this.specifications},
         {group: "Races", values: this.races}
       ]
-    } 
+    },
   },
   mounted () {
     this.roster.sort((a,b) => (a.name > b.name) ? 1 : -1);

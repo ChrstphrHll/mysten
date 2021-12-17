@@ -10,12 +10,14 @@
       </b-collapse>
 
   </b-navbar>
+  <landing v-if="is_home" />
   <directory v-if="is_dir" />
   </div>
 </template>
 
 <script>
 import Directory from './components/Directory.vue'
+import Landing from './components/Landing.vue'
 
 export default {
   name: 'App',
@@ -25,7 +27,8 @@ export default {
     }
   },
   components: {
-    Directory
+    Directory,
+    Landing
   },
   methods: {
     test(par) {
