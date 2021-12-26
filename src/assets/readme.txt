@@ -1,0 +1,1 @@
+Hey! I'm aware that the art in this folder is not mine. If this was a site for any sort of use beyond that of my personal dnd game I would not be using these without permision. Regardless, a huge thank you to the artists for this work. It's gorgeous.
