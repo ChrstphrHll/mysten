@@ -23,7 +23,7 @@ export default {
   name: 'App',
   data: function () {
     return {
-      current_page: 'dir'
+      current_page: 'home'
     }
   },
   components: {
